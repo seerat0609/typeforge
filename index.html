@@ -6,9 +6,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>⌨️ TypeForge</title>
+<title>TypeForge Ultimate</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
@@ -20,15 +22,14 @@ font-family:'Poppins',sans-serif;
 }
 
 body{
-overflow-x:hidden;
-min-height:100vh;
+overflow:hidden;
+height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-padding:40px;
-color:white;
 background:
-radial-gradient(circle at top,#6d2aff,#12061f 60%);
+radial-gradient(circle at top,#6d2aff,#12061f 65%);
+color:white;
 }
 
 /* STARS */
@@ -36,98 +37,77 @@ radial-gradient(circle at top,#6d2aff,#12061f 60%);
 body::before{
 content:"";
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
+top:0;
+left:0;
 background-image:
 radial-gradient(white 1px,transparent 1px),
 radial-gradient(white 1px,transparent 1px);
 background-size:
 120px 120px,
-200px 200px;
-animation:starsMove 80s linear infinite;
-opacity:.4;
-pointer-events:none;
+220px 220px;
+opacity:.35;
+animation:moveStars 100s linear infinite;
 }
 
-@keyframes starsMove{
-from{
-transform:translateY(0);
+@keyframes moveStars{
+from{transform:translateY(0);}
+to{transform:translateY(-1000px);}
 }
-to{
-transform:translateY(-800px);
-}
-}
-
-/* ORBS */
 
 .orb{
-position:fixed;
+position:absolute;
 border-radius:50%;
-filter:blur(60px);
-opacity:.45;
+filter:blur(70px);
+opacity:.4;
 z-index:-1;
-animation:float 12s ease-in-out infinite;
 }
 
 .orb1{
-width:250px;
-height:250px;
+width:280px;
+height:280px;
 background:#ff4fd8;
-top:10%;
 left:5%;
+top:10%;
+animation:float 12s infinite ease-in-out;
 }
 
 .orb2{
-width:300px;
-height:300px;
+width:320px;
+height:320px;
 background:#6d2aff;
-bottom:10%;
 right:5%;
-animation-delay:3s;
+bottom:10%;
+animation:float 15s infinite ease-in-out;
 }
 
 @keyframes float{
-0%,100%{
-transform:translateY(0);
-}
 50%{
-transform:translateY(-40px);
+transform:translateY(-50px);
 }
 }
 
 .container{
-width:100%;
-max-width:1000px;
+width:95%;
+max-width:1200px;
 background:rgba(255,255,255,.08);
 backdrop-filter:blur(20px);
-border:1px solid rgba(255,255,255,.15);
 border-radius:30px;
 padding:40px;
-box-shadow:0 20px 60px rgba(0,0,0,.45);
+border:1px solid rgba(255,255,255,.15);
 }
 
 .logo{
-font-size:70px;
+font-size:65px;
 text-align:center;
 margin-bottom:10px;
-animation:bob 4s ease-in-out infinite;
-}
-
-@keyframes bob{
-0%,100%{
-transform:translateY(0);
-}
-50%{
-transform:translateY(-12px);
-}
 }
 
 h1{
 text-align:center;
-font-size:55px;
-margin-bottom:10px;
+font-size:60px;
+margin-bottom:5px;
 }
 
 .subtitle{
@@ -136,84 +116,87 @@ color:#d9c7ff;
 margin-bottom:25px;
 }
 
-.stats{
+.topStats{
 display:flex;
 justify-content:center;
 gap:20px;
+margin-bottom:30px;
 flex-wrap:wrap;
-margin-bottom:25px;
 }
 
 .stat{
 background:rgba(255,255,255,.08);
-padding:12px 20px;
+padding:15px 25px;
 border-radius:15px;
+font-size:20px;
 font-weight:600;
 }
 
-.passage{
-background:rgba(255,255,255,.08);
-padding:20px;
-border-radius:20px;
-font-size:20px;
-line-height:1.8;
-margin-bottom:20px;
-}
-
-textarea{
-width:100%;
-height:180px;
-border:none;
-outline:none;
-border-radius:20px;
-padding:20px;
-font-size:17px;
-background:rgba(255,255,255,.08);
-color:white;
-resize:none;
-margin-bottom:20px;
-}
-
-textarea::placeholder{
-color:#d9c7ff;
-}
-
-.result{
-display:none;
-margin-top:25px;
+#textDisplay{
 background:rgba(255,255,255,.08);
 padding:25px;
 border-radius:20px;
-animation:slideUp .5s ease;
-}
-
-@keyframes slideUp{
-from{
-opacity:0;
-transform:translateY(30px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-.result h2{
-margin-bottom:15px;
-font-size:34px;
-}
-
-.result p{
-margin-bottom:10px;
-font-size:18px;
+font-size:30px;
+line-height:1.8;
+min-height:180px;
+margin-bottom:20px;
 }
 
 .correct{
-color:#7CFFB2;
+color:white;
+}
+
+.incorrect{
+color:#ff5b6e;
+}
+
+.current{
+border-bottom:3px solid white;
+}
+
+#input{
+width:100%;
+padding:20px;
+font-size:22px;
+border:none;
+outline:none;
+border-radius:20px;
+background:rgba(255,255,255,.08);
+color:white;
+}
+
+#results{
+display:none;
+margin-top:30px;
+background:rgba(255,255,255,.08);
+padding:25px;
+border-radius:20px;
+}
+
+#results h2{
+margin-bottom:20px;
+}
+
+canvas{
+margin-top:20px;
+background:rgba(255,255,255,.05);
+border-radius:20px;
+padding:10px;
+}
+
+button{
+margin-top:20px;
+padding:15px 35px;
+border:none;
+border-radius:15px;
+background:linear-gradient(135deg,#ff5fe1,#8b6cff);
+color:white;
+font-size:18px;
+font-weight:600;
+cursor:pointer;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -231,228 +214,52 @@ color:#7CFFB2;
 Master Speed. Build Accuracy.
 </p>
 
-<div class="stats">
+<div class="topStats">
+
+<div class="stat">
+⏱ Time:
+<span id="timer">60</span>
+</div>
 
 <div class="stat">
 ⚡ WPM:
-<span id="wpmLive">0</span>
+<span id="wpm">0</span>
 </div>
 
 <div class="stat">
 🎯 Accuracy:
-<span id="accuracyLive">100</span>%
+<span id="accuracy">100</span>%
 </div>
 
 <div class="stat">
 ❌ Mistakes:
-<span id="mistakesLive">0</span>
+<span id="mistakes">0</span>
 </div>
 
 </div>
 
-<div
-class="passage"
-id="passage">
-</div>
+<div id="textDisplay"></div>
 
-<textarea
+<input
 id="input"
-placeholder="Start typing here...">
-</textarea>
+type="text"
+placeholder="Start typing...">
 
-<div
-class="result"
-id="result">
+<div id="results">
 
-<h2>🏆 Results</h2>
+<h2>🏆 Test Complete</h2>
 
 <p id="finalWpm"></p>
 <p id="finalAccuracy"></p>
 <p id="finalMistakes"></p>
-<p id="finalRating"></p>
+<p id="badge"></p>
+
+<canvas id="chart"></canvas>
+
+<button onclick="location.reload()">
+Try Again 🚀
+</button>
 
 </div>
 
 </div>
-
-<script>
-
-const passages=[
-
-"Learning new skills expands opportunities and builds confidence.",
-
-"Technology continues to transform the world around us every day.",
-
-"Programming combines creativity and logical thinking together.",
-
-"Success is built through consistency discipline and hard work.",
-
-"Artificial intelligence is shaping the future of innovation."
-
-];
-
-const passage=
-passages[
-Math.floor(
-Math.random()*passages.length
-)
-];
-
-document
-.getElementById("passage")
-.innerText=
-passage;
-
-let started=false;
-let startTime=0;
-
-const input=
-document.getElementById("input");
-
-input.addEventListener(
-"input",
-function(){
-
-const typed=
-input.value;
-
-if(!started){
-
-started=true;
-startTime=Date.now();
-
-}
-
-let correct=0;
-
-for(
-let i=0;
-i<typed.length;
-i++
-){
-
-if(
-typed[i]===
-passage[i]
-){
-
-correct++;
-
-}
-
-}
-
-const mistakes=
-typed.length-correct;
-
-const accuracy=
-typed.length===0
-?100
-:Math.round(
-(correct/typed.length)*100
-);
-
-const minutes=
-(Date.now()-startTime)
-/60000;
-
-const words=
-typed.trim().split(/\s+/).length;
-
-const wpm=
-minutes>0
-?Math.round(words/minutes)
-:0;
-
-document
-.getElementById("wpmLive")
-.innerText=
-wpm;
-
-document
-.getElementById("accuracyLive")
-.innerText=
-accuracy;
-
-document
-.getElementById("mistakesLive")
-.innerText=
-mistakes;
-
-if(
-typed===passage
-){
-
-finishTest(
-wpm,
-accuracy,
-mistakes
-);
-
-}
-
-}
-);
-
-function finishTest(
-wpm,
-accuracy,
-mistakes
-){
-
-let rating=
-"Beginner";
-
-if(wpm>=60){
-
-rating=
-"Expert 🚀";
-
-}
-else if(wpm>=40){
-
-rating=
-"Advanced 🔥";
-
-}
-else if(wpm>=25){
-
-rating=
-"Intermediate 👍";
-
-}
-
-document
-.getElementById("finalWpm")
-.innerHTML=
-"<b>WPM:</b> "+wpm;
-
-document
-.getElementById("finalAccuracy")
-.innerHTML=
-"<b>Accuracy:</b> "+accuracy+"%";
-
-document
-.getElementById("finalMistakes")
-.innerHTML=
-"<b>Mistakes:</b> "+mistakes;
-
-document
-.getElementById("finalRating")
-.innerHTML=
-"<b>Rating:</b> "+rating;
-
-document
-.getElementById("result")
-.style.display=
-"block";
-
-input.disabled=true;
-
-}
-
-</script>
-
-</body>
-
-</html>
