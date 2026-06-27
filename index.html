@@ -1,11 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>TypeForge Ultimate</title>
+<title>TypeForge</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -21,15 +23,15 @@ font-family:'Poppins',sans-serif;
 }
 
 body{
-min-height:100vh;
 background:
-radial-gradient(circle at top,#6d2aff,#12061f 65%);
-color:white;
+radial-gradient(circle at top,#6d2aff,#12061f 70%);
+min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
 padding:30px;
-overflow:hidden;
+overflow-x:hidden;
+color:white;
 }
 
 body::before{
@@ -39,23 +41,24 @@ inset:0;
 background-image:
 radial-gradient(white 1px,transparent 1px);
 background-size:120px 120px;
-opacity:.25;
-animation:stars 80s linear infinite;
+opacity:.18;
+animation:stars 90s linear infinite;
+pointer-events:none;
 }
 
 @keyframes stars{
 from{transform:translateY(0);}
-to{transform:translateY(-1000px);}
+to{transform:translateY(-1200px);}
 }
 
 .container{
 width:100%;
-max-width:1200px;
+max-width:1100px;
 background:rgba(255,255,255,.08);
 backdrop-filter:blur(20px);
 border-radius:30px;
 padding:40px;
-border:1px solid rgba(255,255,255,.12);
+border:1px solid rgba(255,255,255,.1);
 }
 
 .logo{
@@ -66,13 +69,13 @@ text-align:center;
 h1{
 text-align:center;
 font-size:60px;
-margin-top:10px;
+margin:10px 0;
 }
 
 .subtitle{
 text-align:center;
 color:#d8c8ff;
-margin-bottom:25px;
+margin-bottom:30px;
 }
 
 .stats{
@@ -87,31 +90,32 @@ margin-bottom:25px;
 background:rgba(255,255,255,.08);
 padding:15px 22px;
 border-radius:15px;
-font-size:22px;
+font-size:20px;
 font-weight:600;
 }
 
-#textDisplay{
-height:180px;
-overflow:hidden;
+#sentence{
 background:rgba(255,255,255,.08);
 padding:25px;
 border-radius:20px;
 font-size:32px;
 line-height:1.8;
 margin-bottom:20px;
+min-height:140px;
 }
 
 .correct{
 color:white;
 }
 
-.incorrect{
+.wrong{
 color:#ff6b81;
 }
 
 .current{
-border-bottom:3px solid white;
+background:white;
+color:black;
+border-radius:4px;
 }
 
 #input{
@@ -133,6 +137,10 @@ padding:25px;
 border-radius:20px;
 }
 
+#results h2{
+margin-bottom:15px;
+}
+
 canvas{
 margin-top:20px;
 background:rgba(255,255,255,.05);
@@ -152,6 +160,7 @@ cursor:pointer;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -169,11 +178,11 @@ Master Speed. Build Accuracy.
 <div class="stats">
 
 <div class="stat">
-⏱ <span id="timer">60</span>s
+⏱ <span id="time">60</span>s
 </div>
 
 <div class="stat">
-⚡ <span id="wpm">0</span> WPM
+⚡ <span id="wpm">0</span>
 </div>
 
 <div class="stat">
@@ -186,12 +195,12 @@ Master Speed. Build Accuracy.
 
 </div>
 
-<div id="textDisplay"></div>
+<div id="sentence"></div>
 
 <input
 id="input"
 type="text"
-placeholder="Start typing...">
+placeholder="Start typing here...">
 
 <div id="results">
 
@@ -200,7 +209,6 @@ placeholder="Start typing...">
 <p id="finalWpm"></p>
 <p id="finalAccuracy"></p>
 <p id="finalMistakes"></p>
-<p id="finalRank"></p>
 
 <canvas id="chart"></canvas>
 
@@ -209,155 +217,65 @@ Try Again 🚀
 </button>
 
 </div>
+
+</div>
+
 <script>
 
-const words = [
+const sentences = [
 
-"technology","future","innovation","coding","learning",
-"artificial","intelligence","computer","keyboard","speed",
-"accuracy","consistency","practice","success","discipline",
-"growth","development","science","creative","logical",
-"python","javascript","university","education","machine",
-"network","database","algorithm","challenge","opportunity",
-"knowledge","progress","achievement","confidence","focus",
-"productivity","engineering","software","hardware","typing"
+"Practice every day and your typing speed will improve naturally.",
+
+"Artificial intelligence is transforming technology across the world.",
+
+"Consistency is more important than perfection when learning skills.",
+
+"Reading books expands knowledge and strengthens imagination.",
+
+"Success comes from discipline effort and patience over time.",
+
+"Programming teaches logical thinking and problem solving abilities.",
+
+"Small improvements every day create remarkable long term results.",
+
+"Learning new skills expands opportunities and builds confidence."
 
 ];
 
-let text = "";
+let selected =
+sentences[
+Math.floor(
+Math.random()*sentences.length
+)
+];
+
+const sentenceDiv =
+document.getElementById("sentence");
+
+sentenceDiv.innerHTML =
+selected
+.split("")
+.map(letter =>
+`<span>${letter}</span>`
+)
+.join("");
+
 let timer = 60;
 let started = false;
-let interval = null;
 let mistakes = 0;
 let history = [];
-
-const textDisplay =
-document.getElementById("textDisplay");
+let interval;
 
 const input =
 document.getElementById("input");
 
-function generateWords(){
-
-text = "";
-
-for(let i=0;i<25;i++){
-
-text +=
-words[
-Math.floor(
-Math.random()*words.length
-)
-] + " ";
-
-}
-
-textDisplay.innerHTML =
-text
-.split("")
-.map(char =>
-`<span>${char}</span>`
-)
-.join("");
-
-}
-
-generateWords();
-
 input.addEventListener(
 "input",
-handleTyping
-);
-
-function handleTyping(){
+function(){
 
 if(!started){
 
 started = true;
-
-startTimer();
-
-}
-
-const typed =
-input.value;
-
-const chars =
-textDisplay.querySelectorAll("span");
-
-let correct = 0;
-
-mistakes = 0;
-
-chars.forEach(
-(char,index)=>{
-
-const current =
-typed[index];
-
-if(current == null){
-
-char.className = "";
-
-}
-
-else if(
-current ===
-char.innerText
-){
-
-char.className =
-"correct";
-
-correct++;
-
-}
-
-else{
-
-char.className =
-"incorrect";
-
-mistakes++;
-
-}
-
-});
-
-if(
-chars[typed.length]
-){
-
-chars[
-typed.length
-].classList.add(
-"current"
-);
-
-}
-
-const accuracy =
-typed.length === 0
-? 100
-: Math.round(
-(correct /
-typed.length)
-*100
-);
-
-document
-.getElementById("accuracy")
-.innerText =
-accuracy;
-
-document
-.getElementById("mistakes")
-.innerText =
-mistakes;
-
-}
-
-function startTimer(){
 
 interval =
 setInterval(()=>{
@@ -365,27 +283,23 @@ setInterval(()=>{
 timer--;
 
 document
-.getElementById("timer")
-.innerText =
-timer;
+.getElementById("time")
+.innerText = timer;
+
+const elapsed =
+60 - timer;
 
 const wordsTyped =
 input.value
 .trim()
-.split(/\s+/)
-.filter(
-word => word !== ""
-)
+.split(" ")
+.filter(x=>x!="")
 .length;
-
-const elapsed =
-(60 - timer) / 60;
 
 const currentWpm =
 elapsed > 0
 ? Math.round(
-wordsTyped /
-elapsed
+(wordsTyped*60)/elapsed
 )
 : 0;
 
@@ -398,11 +312,7 @@ history.push(
 currentWpm
 );
 
-if(timer <= 0){
-
-clearInterval(
-interval
-);
+if(timer<=0){
 
 finishTest();
 
@@ -412,46 +322,96 @@ finishTest();
 
 }
 
+const typed =
+input.value;
+
+const spans =
+sentenceDiv
+.querySelectorAll("span");
+
+let correct = 0;
+
+mistakes = 0;
+
+spans.forEach(
+(span,index)=>{
+
+const char =
+typed[index];
+
+if(char==null){
+
+span.className="";
+
+}
+
+else if(
+char===span.innerText
+){
+
+span.className="correct";
+
+correct++;
+
+}
+
+else{
+
+span.className="wrong";
+
+mistakes++;
+
+}
+
+});
+
+if(
+spans[typed.length]
+){
+
+spans[
+typed.length
+].classList.add(
+"current"
+);
+
+}
+
+let accuracy =
+typed.length===0
+?100
+:Math.round(
+(correct/typed.length)*100
+);
+
+document
+.getElementById("accuracy")
+.innerText =
+accuracy;
+
+document
+.getElementById("mistakes")
+.innerText =
+mistakes;
+
+if(
+typed === selected
+){
+
+finishTest();
+
+}
+
+});
+
 function finishTest(){
+
+clearInterval(
+interval
+);
 
 input.disabled =
 true;
-
-const finalWpm =
-document
-.getElementById("wpm")
-.innerText;
-
-const finalAccuracy =
-document
-.getElementById("accuracy")
-.innerText;
-
-let rank =
-"🌱 Beginner";
-
-if(finalWpm >= 60){
-
-rank =
-"🚀 Expert";
-
-}
-else if(
-finalWpm >= 40
-){
-
-rank =
-"🔥 Advanced";
-
-}
-else if(
-finalWpm >= 25
-){
-
-rank =
-"👍 Intermediate";
-
-}
 
 document
 .getElementById("results")
@@ -462,25 +422,24 @@ document
 .getElementById("finalWpm")
 .innerHTML =
 "<b>⚡ WPM:</b> "
-+ finalWpm;
++
+document.getElementById("wpm").innerText;
 
 document
 .getElementById("finalAccuracy")
 .innerHTML =
 "<b>🎯 Accuracy:</b> "
-+ finalAccuracy + "%";
++
+document.getElementById("accuracy").innerText
++
+"%";
 
 document
 .getElementById("finalMistakes")
 .innerHTML =
 "<b>❌ Mistakes:</b> "
-+ mistakes;
-
-document
-.getElementById("finalRank")
-.innerHTML =
-"<b>🏆 Rank:</b> "
-+ rank;
++
+mistakes;
 
 new Chart(
 
@@ -488,71 +447,26 @@ document
 .getElementById("chart"),
 
 {
-
 type:"line",
 
 data:{
-
 labels:
 history.map(
 (_,i)=>i+1
 ),
 
 datasets:[{
-
 label:"WPM",
-
 data:history,
-
 borderColor:"#ff5fe1",
-
-backgroundColor:
-"rgba(255,95,225,.2)",
-
+backgroundColor:"rgba(255,95,225,.2)",
 fill:true,
-
 tension:.4
-
 }]
-
 },
 
 options:{
-
-responsive:true,
-
-plugins:{
-
-legend:{
-
-labels:{
-color:"white"
-}
-
-}
-
-},
-
-scales:{
-
-x:{
-
-ticks:{
-color:"white"
-}
-
-},
-
-y:{
-
-ticks:{
-color:"white"
-}
-
-}
-
-}
-
+responsive:true
 }
 
 }
