@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -21,57 +20,71 @@ font-family:'Poppins',sans-serif;
 }
 
 body{
-overflow:hidden;
+overflow-x:hidden;
 min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
+padding:40px;
+color:white;
 background:
 radial-gradient(circle at top,#6d2aff,#12061f 60%);
-color:white;
-padding:30px;
 }
+
+/* STARS */
 
 body::before{
 content:"";
 position:fixed;
-inset:0;
+top:0;
+left:0;
+width:100%;
+height:100%;
 background-image:
 radial-gradient(white 1px,transparent 1px),
 radial-gradient(white 1px,transparent 1px);
-background-size:120px 120px,200px 200px;
+background-size:
+120px 120px,
+200px 200px;
+animation:starsMove 80s linear infinite;
 opacity:.4;
-animation:stars 80s linear infinite;
+pointer-events:none;
 }
 
-@keyframes stars{
-from{transform:translateY(0);}
-to{transform:translateY(-800px);}
+@keyframes starsMove{
+from{
+transform:translateY(0);
 }
+to{
+transform:translateY(-800px);
+}
+}
+
+/* ORBS */
 
 .orb{
 position:fixed;
 border-radius:50%;
-filter:blur(70px);
+filter:blur(60px);
 opacity:.45;
 z-index:-1;
-animation:float 10s ease-in-out infinite;
+animation:float 12s ease-in-out infinite;
 }
 
 .orb1{
 width:250px;
 height:250px;
 background:#ff4fd8;
-left:5%;
 top:10%;
+left:5%;
 }
 
 .orb2{
 width:300px;
 height:300px;
 background:#6d2aff;
-right:5%;
 bottom:10%;
+right:5%;
 animation-delay:3s;
 }
 
@@ -80,7 +93,7 @@ animation-delay:3s;
 transform:translateY(0);
 }
 50%{
-transform:translateY(-35px);
+transform:translateY(-40px);
 }
 }
 
@@ -89,26 +102,31 @@ width:100%;
 max-width:1000px;
 background:rgba(255,255,255,.08);
 backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.15);
 border-radius:30px;
 padding:40px;
-border:1px solid rgba(255,255,255,.1);
-box-shadow:0 20px 60px rgba(0,0,0,.4);
+box-shadow:0 20px 60px rgba(0,0,0,.45);
 }
 
 .logo{
-font-size:65px;
+font-size:70px;
 text-align:center;
+margin-bottom:10px;
 animation:bob 4s ease-in-out infinite;
 }
 
 @keyframes bob{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-12px);}
+0%,100%{
+transform:translateY(0);
+}
+50%{
+transform:translateY(-12px);
+}
 }
 
 h1{
 text-align:center;
-font-size:52px;
+font-size:55px;
 margin-bottom:10px;
 }
 
@@ -121,23 +139,24 @@ margin-bottom:25px;
 .stats{
 display:flex;
 justify-content:center;
-gap:25px;
-margin-bottom:25px;
+gap:20px;
 flex-wrap:wrap;
+margin-bottom:25px;
 }
 
 .stat{
 background:rgba(255,255,255,.08);
 padding:12px 20px;
 border-radius:15px;
+font-weight:600;
 }
 
 .passage{
 background:rgba(255,255,255,.08);
 padding:20px;
 border-radius:20px;
+font-size:20px;
 line-height:1.8;
-font-size:18px;
 margin-bottom:20px;
 }
 
@@ -148,24 +167,15 @@ border:none;
 outline:none;
 border-radius:20px;
 padding:20px;
+font-size:17px;
 background:rgba(255,255,255,.08);
 color:white;
-font-size:16px;
 resize:none;
 margin-bottom:20px;
 }
 
-button{
-display:block;
-margin:auto;
-border:none;
-padding:15px 40px;
-border-radius:15px;
-background:linear-gradient(135deg,#ff5fe1,#8b6cff);
-color:white;
-font-size:18px;
-font-weight:600;
-cursor:pointer;
+textarea::placeholder{
+color:#d9c7ff;
 }
 
 .result{
@@ -174,10 +184,32 @@ margin-top:25px;
 background:rgba(255,255,255,.08);
 padding:25px;
 border-radius:20px;
+animation:slideUp .5s ease;
+}
+
+@keyframes slideUp{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
 }
 
 .result h2{
 margin-bottom:15px;
+font-size:34px;
+}
+
+.result p{
+margin-bottom:10px;
+font-size:18px;
+}
+
+.correct{
+color:#7CFFB2;
 }
 
 </style>
@@ -202,13 +234,18 @@ Master Speed. Build Accuracy.
 <div class="stats">
 
 <div class="stat">
-⏱️ Time:
-<span id="timer">60</span>
+⚡ WPM:
+<span id="wpmLive">0</span>
 </div>
 
 <div class="stat">
-⚡ WPM:
-<span id="liveWpm">0</span>
+🎯 Accuracy:
+<span id="accuracyLive">100</span>%
+</div>
+
+<div class="stat">
+❌ Mistakes:
+<span id="mistakesLive">0</span>
 </div>
 
 </div>
@@ -223,20 +260,16 @@ id="input"
 placeholder="Start typing here...">
 </textarea>
 
-<button onclick="startTest()">
-Start Test 🚀
-</button>
-
 <div
 class="result"
 id="result">
 
-<h2>Results</h2>
+<h2>🏆 Results</h2>
 
-<p id="wpm"></p>
-<p id="accuracy"></p>
-<p id="mistakes"></p>
-<p id="rating"></p>
+<p id="finalWpm"></p>
+<p id="finalAccuracy"></p>
+<p id="finalMistakes"></p>
+<p id="finalRating"></p>
 
 </div>
 
@@ -246,113 +279,175 @@ id="result">
 
 const passages=[
 
-"Practice makes progress and consistency builds success.",
+"Learning new skills expands opportunities and builds confidence.",
 
 "Technology continues to transform the world around us every day.",
 
-"Learning new skills expands opportunities and builds confidence.",
-
 "Programming combines creativity and logical thinking together.",
 
-"Hard work and discipline often outperform natural talent."
+"Success is built through consistency discipline and hard work.",
+
+"Artificial intelligence is shaping the future of innovation."
 
 ];
 
-let selected=
+const passage=
 passages[
-Math.floor(Math.random()*passages.length)
+Math.floor(
+Math.random()*passages.length
+)
 ];
 
-document.getElementById("passage")
-.innerText=selected;
+document
+.getElementById("passage")
+.innerText=
+passage;
 
-let timer=60;
-let interval;
 let started=false;
+let startTime=0;
 
-function startTest(){
+const input=
+document.getElementById("input");
 
-if(started) return;
+input.addEventListener(
+"input",
+function(){
+
+const typed=
+input.value;
+
+if(!started){
 
 started=true;
-
-interval=setInterval(()=>{
-
-timer--;
-
-document.getElementById("timer")
-.innerText=timer;
-
-if(timer<=0){
-
-clearInterval(interval);
-
-finishTest();
+startTime=Date.now();
 
 }
-
-},1000);
-
-}
-
-function finishTest(){
-
-let typed=
-document.getElementById("input")
-.value;
-
-let words=
-typed.trim().split(/\s+/).length;
-
-let wpm=words;
 
 let correct=0;
 
-for(let i=0;i<Math.min(
-typed.length,
-selected.length
-);i++){
+for(
+let i=0;
+i<typed.length;
+i++
+){
 
-if(typed[i]===selected[i]){
+if(
+typed[i]===
+passage[i]
+){
+
 correct++;
-}
 
 }
 
-let accuracy=
-Math.round(
-(correct/selected.length)*100
+}
+
+const mistakes=
+typed.length-correct;
+
+const accuracy=
+typed.length===0
+?100
+:Math.round(
+(correct/typed.length)*100
 );
 
-let mistakes=
-selected.length-correct;
+const minutes=
+(Date.now()-startTime)
+/60000;
 
-let rating="Beginner";
+const words=
+typed.trim().split(/\s+/).length;
 
-if(wpm>50)
-rating="Advanced";
+const wpm=
+minutes>0
+?Math.round(words/minutes)
+:0;
 
-else if(wpm>30)
-rating="Intermediate";
+document
+.getElementById("wpmLive")
+.innerText=
+wpm;
 
-document.getElementById("wpm")
+document
+.getElementById("accuracyLive")
+.innerText=
+accuracy;
+
+document
+.getElementById("mistakesLive")
+.innerText=
+mistakes;
+
+if(
+typed===passage
+){
+
+finishTest(
+wpm,
+accuracy,
+mistakes
+);
+
+}
+
+}
+);
+
+function finishTest(
+wpm,
+accuracy,
+mistakes
+){
+
+let rating=
+"Beginner";
+
+if(wpm>=60){
+
+rating=
+"Expert 🚀";
+
+}
+else if(wpm>=40){
+
+rating=
+"Advanced 🔥";
+
+}
+else if(wpm>=25){
+
+rating=
+"Intermediate 👍";
+
+}
+
+document
+.getElementById("finalWpm")
 .innerHTML=
 "<b>WPM:</b> "+wpm;
 
-document.getElementById("accuracy")
+document
+.getElementById("finalAccuracy")
 .innerHTML=
 "<b>Accuracy:</b> "+accuracy+"%";
 
-document.getElementById("mistakes")
+document
+.getElementById("finalMistakes")
 .innerHTML=
 "<b>Mistakes:</b> "+mistakes;
 
-document.getElementById("rating")
+document
+.getElementById("finalRating")
 .innerHTML=
 "<b>Rating:</b> "+rating;
 
-document.getElementById("result")
-.style.display="block";
+document
+.getElementById("result")
+.style.display=
+"block";
+
+input.disabled=true;
 
 }
 
