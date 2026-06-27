@@ -263,3 +263,346 @@ Try Again 🚀
 </div>
 
 </div>
+<script>
+
+const words = [
+"technology","future","innovation","coding","learning",
+"artificial","intelligence","computer","keyboard","speed",
+"accuracy","consistency","practice","success","discipline",
+"growth","development","science","creative","logical",
+"python","javascript","university","education","machine",
+"network","database","algorithm","challenge","opportunity",
+"knowledge","progress","achievement","confidence","focus",
+"productivity","engineering","software","hardware","typing"
+];
+
+let generatedText = "";
+let timer = 60;
+let started = false;
+let interval = null;
+
+let mistakes = 0;
+let wpmHistory = [];
+
+const textDisplay =
+document.getElementById("textDisplay");
+
+const input =
+document.getElementById("input");
+
+function generateText(){
+
+generatedText = "";
+
+for(let i=0;i<80;i++){
+
+generatedText +=
+words[
+Math.floor(
+Math.random()*words.length
+)
+] + " ";
+
+}
+
+textDisplay.innerHTML =
+generatedText
+.split("")
+.map(letter=>
+`<span>${letter}</span>`
+)
+.join("");
+
+}
+
+generateText();
+
+input.addEventListener(
+"input",
+handleTyping
+);
+
+function handleTyping(){
+
+if(!started){
+
+started = true;
+
+startTimer();
+
+}
+
+const typed =
+input.value;
+
+const characters =
+textDisplay.querySelectorAll("span");
+
+let correct = 0;
+
+mistakes = 0;
+
+characters.forEach(
+(char,index)=>{
+
+const current =
+typed[index];
+
+if(current == null){
+
+char.className = "";
+
+}
+
+else if(
+current === char.innerText
+){
+
+char.className =
+"correct";
+
+correct++;
+
+}
+
+else{
+
+char.className =
+"incorrect";
+
+mistakes++;
+
+}
+
+});
+
+if(
+characters[typed.length]
+){
+
+characters[
+typed.length
+].classList.add(
+"current"
+);
+
+}
+
+const accuracy =
+typed.length === 0
+? 100
+: Math.round(
+(correct / typed.length)
+*100
+);
+
+document
+.getElementById("accuracy")
+.innerText =
+accuracy;
+
+document
+.getElementById("mistakes")
+.innerText =
+mistakes;
+
+}
+
+function startTimer(){
+
+interval =
+setInterval(()=>{
+
+timer--;
+
+document
+.getElementById("timer")
+.innerText =
+timer;
+
+const wordsTyped =
+input.value
+.trim()
+.split(/\s+/)
+.filter(word=>word!="")
+.length;
+
+const elapsed =
+(60 - timer) / 60;
+
+const currentWpm =
+elapsed > 0
+? Math.round(
+wordsTyped / elapsed
+)
+: 0;
+
+document
+.getElementById("wpm")
+.innerText =
+currentWpm;
+
+wpmHistory.push(
+currentWpm
+);
+
+if(timer <= 0){
+
+clearInterval(
+interval
+);
+
+finishTest();
+
+}
+
+},1000);
+
+}
+
+function finishTest(){
+
+input.disabled = true;
+
+const finalWpm =
+document
+.getElementById("wpm")
+.innerText;
+
+const finalAccuracy =
+document
+.getElementById("accuracy")
+.innerText;
+
+let badge =
+"🌱 Beginner";
+
+if(finalWpm >= 60){
+
+badge =
+"🚀 Expert";
+
+}
+else if(
+finalWpm >= 40
+){
+
+badge =
+"🔥 Advanced";
+
+}
+else if(
+finalWpm >= 25
+){
+
+badge =
+"👍 Intermediate";
+
+}
+
+document
+.getElementById("results")
+.style.display =
+"block";
+
+document
+.getElementById("finalWpm")
+.innerHTML =
+"<b>⚡ WPM:</b> "
++ finalWpm;
+
+document
+.getElementById("finalAccuracy")
+.innerHTML =
+"<b>🎯 Accuracy:</b> "
++ finalAccuracy + "%";
+
+document
+.getElementById("finalMistakes")
+.innerHTML =
+"<b>❌ Mistakes:</b> "
++ mistakes;
+
+document
+.getElementById("badge")
+.innerHTML =
+"<b>🏆 Rank:</b> "
++ badge;
+
+new Chart(
+
+document
+.getElementById("chart"),
+
+{
+
+type:"line",
+
+data:{
+
+labels:
+wpmHistory.map(
+(_,i)=>i+1
+),
+
+datasets:[{
+
+label:"WPM",
+
+data:wpmHistory,
+
+borderColor:"#ff5fe1",
+
+backgroundColor:
+"rgba(255,95,225,.2)",
+
+tension:.4
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+plugins:{
+
+legend:{
+
+labels:{
+color:"white"
+}
+
+}
+
+},
+
+scales:{
+
+x:{
+ticks:{
+color:"white"
+}
+},
+
+y:{
+ticks:{
+color:"white"
+}
+}
+
+}
+
+}
+
+}
+
+);
+
+}
+
+</script>
+
+</body>
+</html>
