@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>⌨️ TypeForge</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+overflow:hidden;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:
+radial-gradient(circle at top,#6d2aff,#12061f 60%);
+color:white;
+padding:30px;
+}
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background-image:
+radial-gradient(white 1px,transparent 1px),
+radial-gradient(white 1px,transparent 1px);
+background-size:120px 120px,200px 200px;
+opacity:.4;
+animation:stars 80s linear infinite;
+}
+
+@keyframes stars{
+from{transform:translateY(0);}
+to{transform:translateY(-800px);}
+}
+
+.orb{
+position:fixed;
+border-radius:50%;
+filter:blur(70px);
+opacity:.45;
+z-index:-1;
+animation:float 10s ease-in-out infinite;
+}
+
+.orb1{
+width:250px;
+height:250px;
+background:#ff4fd8;
+left:5%;
+top:10%;
+}
+
+.orb2{
+width:300px;
+height:300px;
+background:#6d2aff;
+right:5%;
+bottom:10%;
+animation-delay:3s;
+}
+
+@keyframes float{
+0%,100%{
+transform:translateY(0);
+}
+50%{
+transform:translateY(-35px);
+}
+}
+
+.container{
+width:100%;
+max-width:1000px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(20px);
+border-radius:30px;
+padding:40px;
+border:1px solid rgba(255,255,255,.1);
+box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+
+.logo{
+font-size:65px;
+text-align:center;
+animation:bob 4s ease-in-out infinite;
+}
+
+@keyframes bob{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-12px);}
+}
+
+h1{
+text-align:center;
+font-size:52px;
+margin-bottom:10px;
+}
+
+.subtitle{
+text-align:center;
+color:#d9c7ff;
+margin-bottom:25px;
+}
+
+.stats{
+display:flex;
+justify-content:center;
+gap:25px;
+margin-bottom:25px;
+flex-wrap:wrap;
+}
+
+.stat{
+background:rgba(255,255,255,.08);
+padding:12px 20px;
+border-radius:15px;
+}
+
+.passage{
+background:rgba(255,255,255,.08);
+padding:20px;
+border-radius:20px;
+line-height:1.8;
+font-size:18px;
+margin-bottom:20px;
+}
+
+textarea{
+width:100%;
+height:180px;
+border:none;
+outline:none;
+border-radius:20px;
+padding:20px;
+background:rgba(255,255,255,.08);
+color:white;
+font-size:16px;
+resize:none;
+margin-bottom:20px;
+}
+
+button{
+display:block;
+margin:auto;
+border:none;
+padding:15px 40px;
+border-radius:15px;
+background:linear-gradient(135deg,#ff5fe1,#8b6cff);
+color:white;
+font-size:18px;
+font-weight:600;
+cursor:pointer;
+}
+
+.result{
+display:none;
+margin-top:25px;
+background:rgba(255,255,255,.08);
+padding:25px;
+border-radius:20px;
+}
+
+.result h2{
+margin-bottom:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="container">
+
+<div class="logo">⌨️</div>
+
+<h1>TypeForge</h1>
+
+<p class="subtitle">
+Master Speed. Build Accuracy.
+</p>
+
+<div class="stats">
+
+<div class="stat">
+⏱️ Time:
+<span id="timer">60</span>
+</div>
+
+<div class="stat">
+⚡ WPM:
+<span id="liveWpm">0</span>
+</div>
+
+</div>
+
+<div
+class="passage"
+id="passage">
+</div>
+
+<textarea
+id="input"
+placeholder="Start typing here...">
+</textarea>
+
+<button onclick="startTest()">
+Start Test 🚀
+</button>
+
+<div
+class="result"
+id="result">
+
+<h2>Results</h2>
+
+<p id="wpm"></p>
+<p id="accuracy"></p>
+<p id="mistakes"></p>
+<p id="rating"></p>
+
+</div>
+
+</div>
+
+<script>
+
+const passages=[
+
+"Practice makes progress and consistency builds success.",
+
+"Technology continues to transform the world around us every day.",
+
+"Learning new skills expands opportunities and builds confidence.",
+
+"Programming combines creativity and logical thinking together.",
+
+"Hard work and discipline often outperform natural talent."
+
+];
+
+let selected=
+passages[
+Math.floor(Math.random()*passages.length)
+];
+
+document.getElementById("passage")
+.innerText=selected;
+
+let timer=60;
+let interval;
+let started=false;
+
+function startTest(){
+
+if(started) return;
+
+started=true;
+
+interval=setInterval(()=>{
+
+timer--;
+
+document.getElementById("timer")
+.innerText=timer;
+
+if(timer<=0){
+
+clearInterval(interval);
+
+finishTest();
+
+}
+
+},1000);
+
+}
+
+function finishTest(){
+
+let typed=
+document.getElementById("input")
+.value;
+
+let words=
+typed.trim().split(/\s+/).length;
+
+let wpm=words;
+
+let correct=0;
+
+for(let i=0;i<Math.min(
+typed.length,
+selected.length
+);i++){
+
+if(typed[i]===selected[i]){
+correct++;
+}
+
+}
+
+let accuracy=
+Math.round(
+(correct/selected.length)*100
+);
+
+let mistakes=
+selected.length-correct;
+
+let rating="Beginner";
+
+if(wpm>50)
+rating="Advanced";
+
+else if(wpm>30)
+rating="Intermediate";
+
+document.getElementById("wpm")
+.innerHTML=
+"<b>WPM:</b> "+wpm;
+
+document.getElementById("accuracy")
+.innerHTML=
+"<b>Accuracy:</b> "+accuracy+"%";
+
+document.getElementById("mistakes")
+.innerHTML=
+"<b>Mistakes:</b> "+mistakes;
+
+document.getElementById("rating")
+.innerHTML=
+"<b>Rating:</b> "+rating;
+
+document.getElementById("result")
+.style.display="block";
+
+}
+
+</script>
+
+</body>
+
+</html>
